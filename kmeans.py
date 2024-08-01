@@ -5,14 +5,15 @@ from typing import List
 from random import random
 
 class KMeans:
-    def __init__(self, k: int) -> None:
+    def __init__(self, k: int, tol: float = 1e-5) -> None:
         self.k = k
+        self.tol = tol
     
-    def stopping_criteria(self, pre_centroids: List[List], centroids: List[List], tol=1e-5):
+    def stopping_criteria(self, pre_centroids: List[List], centroids: List[List]):
         sum_movement = 0
         for x, y in zip(pre_centroids, centroids):
             sum_movement += self.compute_distance(x, y)
-        return sum_movement > tol
+        return sum_movement > self.tol
         
     def fit_1(self, data: List[List], ) -> None:
 
