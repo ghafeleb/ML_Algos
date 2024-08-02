@@ -13,7 +13,7 @@ class KMeans:
         sum_movement = 0
         for x, y in zip(pre_centroids, centroids):
             sum_movement += self.compute_distance(x, y)
-        return sum_movement > self.tol
+        return sum_movement < self.tol
         
     def fit_1(self, data: List[List], ) -> None:
 
@@ -22,6 +22,7 @@ class KMeans:
         assert len(data[0]) <= self.k, print("Too large k. Each data point is a cluster centroid itself. ")
         
         self.centroids = self.initialize_centroids(data)
+        counter_loop = 0
         while True:
             pre_centroids = self.centroids
             labels = self.predict(data,)
@@ -29,6 +30,8 @@ class KMeans:
             
             if self.stopping_criteria(pre_centroids, self.centroids):
                 break
+            counter_loop += 1
+        print(counter_loop)
     
     def fit_2(self, data: List[List], n_iteration: float) -> None:
         assert len(data) > 0, print("Data is empty!")
@@ -72,6 +75,7 @@ class KMeans:
             
         centroids = []
         for idx_centroid in range(self.k):
+            np.random.seed(42)
             centroid = [self.get_random_val(feature_min[idx], feature_max[idx]) for idx in range(n_feature)]
             centroids.append(centroid)
         return centroids

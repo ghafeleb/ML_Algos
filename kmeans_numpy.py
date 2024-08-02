@@ -21,6 +21,7 @@ class KMeans_NumPy:
         self.centroids = self.initialize_centroids(data)
         
         # Loop
+        counter_loop = 0
         while True:
             pre_centroids = self.centroids
             # Get labels
@@ -31,6 +32,8 @@ class KMeans_NumPy:
             if self.stopping_criteria(self.centroids, pre_centroids):
                 break
             pre_centroids = self.centroids
+            counter_loop += 1
+        print(counter_loop)
         
         
     def initialize_centroids(self, data: np.ndarray) -> np.ndarray:
