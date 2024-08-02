@@ -1,6 +1,7 @@
 import sys, os
 sys.path.insert(0, '../')
 import numpy as np
+import math
 """
 1. Initialize weights
 2. Go over loop
@@ -10,7 +11,84 @@ import numpy as np
     - check the stopping criteria
 
 """
-
+class LogisticRegression:
+    def __init__(self, n_iter, learning_rate):
+        self.n_iter = n_iter
+        self.learning_rate = learning_rate
+        
+    def initialize_weights(self, n_feature):
+        b = 0
+        W = [0 for i in range(n_feature)]
+        return W, b
+        
+       
+    def compute_loss(self, pred_list, y_list):
+        eps = 1e-9
+        bce = 0
+        for pred, y in zip(pred_list, y_list):
+            log_loss_0 = (1 - y) * math.log(1 - pred + eps)
+            log_loss_1 = y * math.log(pred + eps)
+            bce += -(log_loss_0 + log_loss_1) / len(y_list)
+        return bce
+        
+    def get_gradients(self, X, pred, y):
+        dW = [0 for i in range(len(X[0]))]
+        db = 0
+        for x, pred_point, y_point in zip(X, pred, y):
+            for idx_feature, feature_val in enumerate(x):
+                dW[idx_feature] += feature_val * (pred_point - y_point) / len(X)
+            db += (pred_point - y_point) / len(X)
+        return dW, db
+            
+    
+    def update_weights(self, dW, db):
+        for idx_feature in range(len(dW)):
+            self.W[idx_feature] -= self.learning_rate * dW[idx_feature]
+        self.b -= self.learning_rate * db
+    
+    def fit(self, X, y):
+        n_sample, n_feature = len(X), len(X[0])
+        # Initialize the weights and bias
+        self.W, self.b = self.initialize_weights(n_feature)
+        
+        # Compute loss
+        pred = self.predict(X)
+        loss = self.compute_loss(pred, y)
+        
+        # Loop
+        for i in range(self.n_iter):
+            # Compute the predictions
+            pred = self.predict(X)
+            # Compute the gradients
+            dW, db = self.get_gradients(X, pred, y)
+            # Update the weights
+            self.update_weights(dW, db)
+            # Re-compute loss
+            pred = self.predict(X)
+            loss = self.compute_loss(pred, y)
+        
+        
+    def sigmoid(self, x):
+        return 1 / (1 + math.exp(-x))
+    
+    def predict(self, X):
+        pred_prob_values = []
+        for i, x in enumerate(X):
+            linear_value = sum([x[idx_feature] * self.W[idx_feature] for idx_feature in range(len(X[0]))]) + self.b
+            
+            # Get prob from linear values using sigmoid
+            pred_prob = self.sigmoid(linear_value)
+            
+            pred_prob_values.append(pred_prob)
+        
+        return pred_prob_values
+    
+    def predict_labels(self, X, threshold):
+        pred = self.predict(X)
+        labels = [1 if pred_val > threshold else 0 for pred_val in pred]
+        return labels
+    
+    
 class LogisticRegressionNumPy2:
     def __init__(self, n_iter: int, learning_rate: float) -> None:
         self.n_iter = n_iter
